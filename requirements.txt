@@ -4,3 +4,4 @@ shap==0.44.0
 streamlit==1.33.0
 scikit-learn==1.6.1
 matplotlib==3.7.5
+dice_ml==0.12
