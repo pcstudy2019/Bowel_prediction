@@ -149,7 +149,7 @@ def generate_counterfactuals(model, patient_data):
                           'PreviousAbdominopelvicSurgery_3.0','DietaryRestriction_1', 'DietaryRestriction_2', 'DietaryRestriction_3',
                           'DietaryRestriction_4', 'LaxativeRegimen_1', 'LaxativeRegimen_2', 'LaxativeRegimen_3', 'LaxativeRegimen_4', 
                           'LaxativeRegimen_5', 'LaxativeRegimen_6', 'outcome']
-    st.success("使用真实训练数据生成反事实")
+    st.success("")
     
     # ========== 与你原代码一致的特征类型定义 ==========
     continuous_vars = ['Age', 'BMI', 'DietaryRestrictionDays']  # 与你原代码完全一致
@@ -367,3 +367,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
