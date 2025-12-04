@@ -32,7 +32,7 @@ FEATURE_DETAILS = {
     'Sex': {'display': 'Sex', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Female', 2: 'Male'}},
     'BMI': {'display': 'BMI', 'type': 'slider', 'min': 15, 'max': 40, 'default': 28},
     'InpatientStatus': {'display': 'Inpatient Status', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Outpatient', 2: 'Inpatient'}},
-    'PreviousColonoscopy': {'display': 'Previous Colonoscopy', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'PreviousColonoscopy': {'display': 'Previous Colonoscopy', 'type': 'select', 'options': [1, 2], 'labels': {2: 'No', 1: 'Yes'}},
     'ChronicConstipation': {'display': 'Chronic Constipation', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
     'DiabetesMellitus': {'display': 'Diabetes Mellitus', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
     'StoolForm': {'display': 'Stool Form', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Normal', 2: 'Abnormal'}},
@@ -139,96 +139,125 @@ class ModelWrapper:
         return self.model.predict_proba(X)
 
 # ========== Counterfactual Generation ==========
-# ========== Counterfactual Generation ==========
 def generate_counterfactuals(model, patient_data):
-    # Create dummy training data (optimized for more realistic distribution)
-    n_samples = 200  # 增加样本数，让数据更接近真实分布
-    dummy_train = {}
-    for col in FEATURE_ORDER:
-        feat_detail = FEATURE_DETAILS[col]
-        if feat_detail['type'] == 'select':
-            dummy_train[col] = np.random.choice(feat_detail['options'], size=n_samples)
-        elif feat_detail['type'] == 'slider':
-            if col == 'Age':
-                dummy_train[col] = np.random.randint(20, 80, size=n_samples)  # 更合理的年龄范围
-            elif col == 'DietaryRestrictionDays':
-                dummy_train[col] = np.random.randint(0, 4, size=n_samples)
-            elif col == 'BMI':
-                dummy_train[col] = np.random.uniform(18, 35, size=n_samples)  # 更合理的BMI范围
+    # ========== 加载真实训练数据（确保train_data.csv包含所有特征列 + outcome列） ==========
+    # 直接加载真实训练数据，列顺序与你原代码严格对齐
+    train_data = pd.read_csv("train_data.csv")  
+    train_data.columns = ['HospitalGrade', 'Age', 'Sex', 'BMI', 'InpatientStatus', 'PreviousColonoscopy', 'ChronicConstipation', 
+                          'DiabetesMellitus', 'StoolForm', 'BowelMovements', 'BPEducationModality', 'DietaryRestrictionDays', 
+                          'PreColonoscopyPhysicalActivity', 'PreviousAbdominopelvicSurgery_1.0', 'PreviousAbdominopelvicSurgery_2.0', 
+                          'PreviousAbdominopelvicSurgery_3.0','DietaryRestriction_1', 'DietaryRestriction_2', 'DietaryRestriction_3',
+                          'DietaryRestriction_4', 'LaxativeRegimen_1', 'LaxativeRegimen_2', 'LaxativeRegimen_3', 'LaxativeRegimen_4', 
+                          'LaxativeRegimen_5', 'LaxativeRegimen_6', 'outcome']
+    st.success("使用真实训练数据生成反事实")
     
-    dummy_train = pd.DataFrame(dummy_train)
-    dummy_train['outcome'] = np.random.choice([0, 1], size=n_samples, p=[0.6, 0.4])  # 调整正负样本比例
+    # ========== 与你原代码一致的特征类型定义 ==========
+    continuous_vars = ['Age', 'BMI', 'DietaryRestrictionDays']  # 与你原代码完全一致
+    binary_vars = ['HospitalGrade','Sex', 'InpatientStatus','PreviousColonoscopy', 
+                   'ChronicConstipation', 'DiabetesMellitus', 'StoolForm', 'BPEducationModality', 
+                   'PreColonoscopyPhysicalActivity', 'outcome',
+                   'PreviousAbdominopelvicSurgery_1.0','PreviousAbdominopelvicSurgery_2.0',
+                   'PreviousAbdominopelvicSurgery_3.0','DietaryRestriction_1', 'DietaryRestriction_2', 
+                   'DietaryRestriction_3','DietaryRestriction_4', 'LaxativeRegimen_1', 'LaxativeRegimen_2',
+                   'LaxativeRegimen_3', 'LaxativeRegimen_4', 'LaxativeRegimen_5','LaxativeRegimen_6']
+    ordinal_vars = ['BowelMovements']  # 与你原代码完全一致
     
-    # Define feature types
-    continuous_vars = ['Age', 'BMI', 'DietaryRestrictionDays']
-    categorical_vars = [col for col in FEATURE_ORDER if col not in continuous_vars]
+    # ========== 严格对齐你原代码的可干预变量（features_to_vary） ==========
+    INTERVENABLE_FEATURES = [
+        'DietaryRestrictionDays', 
+        'PreColonoscopyPhysicalActivity',
+        'DietaryRestriction_1', 'DietaryRestriction_2', 'DietaryRestriction_3', 'DietaryRestriction_4',
+        'LaxativeRegimen_1', 'LaxativeRegimen_2', 'LaxativeRegimen_3', 'LaxativeRegimen_4', 'LaxativeRegimen_5', 'LaxativeRegimen_6'
+    ]
+    INTERVENABLE_FEATURES = [col for col in INTERVENABLE_FEATURES if col in patient_data.columns]
     
-    # Create DiCE data object
+    # ========== 创建DiCE对象（与你原代码参数一致） ==========
     data = dice_ml.Data(
-        dataframe=dummy_train,
-        continuous_features=continuous_vars,
-        categorical_features=categorical_vars,
+        dataframe=train_data, 
+        continuous_features=continuous_vars, 
+        categorical_features=binary_vars + ordinal_vars,
         outcome_name='outcome'
     )
-    
-    # Wrap model
-    wrapped_model = ModelWrapper(model)
-    
-    # Create DiCE model and explainer
+    wrapped_model = ModelWrapper(model, threshold=0.27)  # 与你原阈值一致
     dice_model = dice_ml.Model(model=wrapped_model, backend='sklearn')
     exp = dice_ml.Dice(data, dice_model)
     
-    # Relaxed constraints (easier to generate valid counterfactuals)
+    # ========== 与你原代码完全一致的互斥约束（必须恰好1个） ==========
     def mutually_exclusive_constraint(instance):
-        # 放宽约束：允许饮食限制/泻药方案有一个选中（非严格必须）
-        diet_cols = [f'DietaryRestriction_{i}' for i in range(1, 5)]
-        lax_cols = [f'LaxativeRegimen_{i}' for i in range(1, 7)]
-        # 只要至少有一个选中即可，非严格恰好一个
-        if sum(instance[col] for col in diet_cols) < 1 or sum(instance[col] for col in lax_cols) < 1:
+        # 检查dietary变量：必须恰好1个为1
+        dietary_values = [instance['DietaryRestriction_1'], instance['DietaryRestriction_2'], 
+                          instance['DietaryRestriction_3'], instance['DietaryRestriction_4']]
+        dietary_sum = sum(dietary_values)
+        if dietary_sum != 1:
             return False
+        
+        # 检查protocol变量：必须恰好1个为1
+        protocol_values = [instance['LaxativeRegimen_1'], instance['LaxativeRegimen_2'], 
+                           instance['LaxativeRegimen_3'], instance['LaxativeRegimen_4'],
+                           instance['LaxativeRegimen_5'], instance['LaxativeRegimen_6']]
+        protocol_sum = sum(protocol_values)
+        if protocol_sum != 1:
+            return False
+        
         return True
     
-    # Relaxed clinical check
-    def clinical_plausibility_check(cf, original):
+    # ========== 与你原代码一致的临床合理性检查 ==========
+    def clinical_plausibility_check(cf_instance, original_instance):
         issues = []
-        # 注释年龄检查，或放宽BMI阈值
-        # if cf['Age'] < original['Age'].iloc[0]:
-        #     issues.append("Age cannot decrease")
-        if abs(cf['BMI'] - original['BMI'].iloc[0]) > 10:  # 从5放宽到10
-            issues.append(f"BMI change too large ({abs(cf['BMI'] - original['BMI'].iloc[0]):.1f})")
+        # 年龄不能减少（与你原代码一致）
+        if cf_instance['Age'] < original_instance['Age'].values[0]:
+            issues.append("年龄不能减少")
+        
+        # BMI变化不超过5（与你原代码一致）
+        bmi_change = abs(cf_instance['BMI'] - original_instance['BMI'].values[0])
+        if bmi_change > 5:
+            issues.append(f"BMI变化过大: {bmi_change:.2f}")
+        
         return issues
     
-    # Generate more counterfactual candidates
+    # ========== 生成反事实（变量范围与你原代码一致） ==========
     try:
         dice_exp = exp.generate_counterfactuals(
             patient_data,
-            total_CFs=20,  # 增加候选数
-            features_to_vary=[col for col in FEATURE_ORDER if col != 'Age'],  # 只固定年龄，其他都可修改
-            desired_class="opposite"    
+            total_CFs=10,  # 与你原代码数量一致
+            features_to_vary=INTERVENABLE_FEATURES,  # 严格对齐你指定的变量
+            desired_class="opposite"  # 指定目标类为0（与你原逻辑一致）
         )
         
-        # Filter valid counterfactuals
+        # ========== 与你原代码一致的筛选逻辑 ==========
+        def filter_counterfactuals(cf_df):
+            filtered_cfs = []
+            for _, cf in cf_df.iterrows():
+                # 检查互斥约束
+                if mutually_exclusive_constraint(cf):
+                    # 检查临床合理性
+                    issues = clinical_plausibility_check(cf, patient_data)
+                    if not issues:
+                        filtered_cfs.append(cf)
+                    else:
+                        st.write(f"排除一个反事实，原因: {', '.join(issues)}")
+            return pd.DataFrame(filtered_cfs)
+        
+        # 获取反事实结果并筛选
         cf_df = dice_exp.cf_examples_list[0].final_cfs_df
-        valid_cfs = []
+        filtered_cf_df = filter_counterfactuals(cf_df)
+        
+        # 生成解释（与你原代码逻辑一致）
         explanations = []
+        if not filtered_cf_df.empty:
+            for idx, cf in filtered_cf_df.iterrows():
+                changes = {}
+                for col in cf.index:
+                    if col != 'outcome' and cf[col] != patient_data[col].values[0]:
+                        changes[col] = f"{patient_data[col].values[0]} → {cf[col]}"
+                explanations.append(changes)
         
-        for _, cf in cf_df.iterrows():
-            if mutually_exclusive_constraint(cf):
-                issues = clinical_plausibility_check(cf, patient_data)
-                if not issues:
-                    valid_cfs.append(cf)
-                    # Generate explanation
-                    changes = {}
-                    for col in FEATURE_ORDER:
-                        if cf[col] != patient_data[col].iloc[0]:
-                            changes[FEATURE_DETAILS[col]['display']] = f"{patient_data[col].iloc[0]} → {cf[col]}"
-                    explanations.append(changes)
-        
-        return pd.DataFrame(valid_cfs), explanations
+        return filtered_cf_df, explanations
+    
     except Exception as e:
-        st.error(f"Failed to generate counterfactuals: {str(e)}")
+        st.error(f"生成反事实时出错: {str(e)}")
         import traceback
-        st.code(traceback.format_exc())  # 显示详细错误，方便排查
+        st.code(traceback.format_exc())
         return pd.DataFrame(), []
 
 # ========== SHAP Explanations ==========
