@@ -38,7 +38,7 @@ FEATURE_DETAILS = {
     'StoolForm': {'display': 'Stool Form', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Bristol Stool Form Scale types 3-7', 2: 'Bristol Stool Form Scale types 1-2'}},
     'BowelMovements': {'display': 'Bowel Movements', 'type': 'select', 'options': [1, 2, 3, 4], 'labels': {1: '<5', 2: '5-10', 3: '10-20', 4: '≥20'}},
     'BPEducationModality': {'display': 'BP Education Modality', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Enhanced (image or animation-based education)', 2: 'Traditional (text or verbal education)'},'default': 2},
-    'DietaryRestrictionDays': {'display': 'Dietary Restriction Days', 'type': 'slider', 'min': 0.0, 'max': 3.0,  'step': 0.5, 'default': 1.0},
+    'DietaryRestrictionDays': {'display': 'Dietary Restriction Days', 'type': 'slider', 'min': 0.0, 'max': 3.0,  'step': 0.5, 'default':0.5},
     'PreColonoscopyPhysicalActivity': {'display': 'Pre-Colonoscopy Physical Activity', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
     'PreviousAbdominopelvicSurgery_1.0': {'display': 'History of abdominal/pelvic surgery', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'},'default': 1},
     'PreviousAbdominopelvicSurgery_2.0': {'display': 'History of abdominal surgery', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
@@ -380,6 +380,7 @@ that provides targeted improvement suggestions for clinicians and patients to he
 
 if __name__ == "__main__":
     main()
+
 
 
 
