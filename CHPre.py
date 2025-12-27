@@ -117,7 +117,7 @@ def create_input_form():
                 input_data['DietaryRestriction_3'] = st.selectbox(FEATURE_DETAILS['DietaryRestriction_3']['display'], FEATURE_DETAILS['DietaryRestriction_3']['options'], format_func=lambda x: FEATURE_DETAILS['DietaryRestriction_3']['labels'][x])
                 input_data['DietaryRestriction_4'] = st.selectbox(FEATURE_DETAILS['DietaryRestriction_4']['display'], FEATURE_DETAILS['DietaryRestriction_4']['options'], format_func=lambda x: FEATURE_DETAILS['DietaryRestriction_4']['labels'][x])
                
-               input_data['DietaryRestrictionDays'] = st.slider(FEATURE_DETAILS['DietaryRestrictionDays']['display'], FEATURE_DETAILS['DietaryRestrictionDays']['min'], FEATURE_DETAILS['DietaryRestrictionDays']['max'], FEATURE_DETAILS['DietaryRestrictionDays']['default'])
+            input_data['DietaryRestrictionDays'] = st.slider(FEATURE_DETAILS['DietaryRestrictionDays']['display'], FEATURE_DETAILS['DietaryRestrictionDays']['min'], FEATURE_DETAILS['DietaryRestrictionDays']['max'], FEATURE_DETAILS['DietaryRestrictionDays']['default'])
             st.markdown("**Laxative Regimen**")
             cols_lax = st.columns(3)
             with cols_lax[0]:
@@ -380,6 +380,7 @@ that provides targeted improvement suggestions for clinicians and patients to he
 
 if __name__ == "__main__":
     main()
+
 
 
 
