@@ -27,7 +27,7 @@ OPTIMAL_THRESHOLD = 0.27
 
 # Feature definitions (English display names)
 FEATURE_DETAILS = {
-    'HospitalGrade': {'display': 'Hospital Grade', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Non-Tertiary', 2: 'Tertiary'}},
+    'HospitalGrade': {'display': 'Hospital Grade', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Non-Tertiary', 2: 'Tertiary'}, 'default': 2},
     'Age': {'display': 'Age (years)', 'type': 'slider', 'min': 18, 'max': 90, 'default': 55},
     'Sex': {'display': 'Sex', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Female', 2: 'Male'}},
     'BMI': {'display': 'BMI', 'type': 'slider', 'min': 15, 'max': 40, 'default': 28},
@@ -37,22 +37,22 @@ FEATURE_DETAILS = {
     'DiabetesMellitus': {'display': 'Diabetes Mellitus', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
     'StoolForm': {'display': 'Stool Form', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Bristol Stool Form Scale types 3-7', 2: 'Bristol Stool Form Scale types 1-2'}},
     'BowelMovements': {'display': 'Bowel Movements', 'type': 'select', 'options': [1, 2, 3, 4], 'labels': {1: '<5', 2: '5-10', 3: '10-20', 4: '≥20'}},
-    'BPEducationModality': {'display': 'BP Education Modality', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Enhanced', 2: 'Traditional'}},
-    'DietaryRestrictionDays': {'display': 'Dietary Restriction Days', 'type': 'slider', 'min': 0, 'max': 3, 'default': 1},
+    'BPEducationModality': {'display': 'BP Education Modality', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Enhanced (image or animation-based education)', 2: 'Traditional (text or verbal education)'},'default': 2},
+    'DietaryRestrictionDays': {'display': 'Dietary Restriction Days', 'type': 'slider', 'min': 0.0, 'max': 3.0,  'step': 0.5, 'default': 1.0},
     'PreColonoscopyPhysicalActivity': {'display': 'Pre-Colonoscopy Physical Activity', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'PreviousAbdominopelvicSurgery_1.0': {'display': 'Previous Surgery History: No history of abdominal/pelvic surgery', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'PreviousAbdominopelvicSurgery_2.0': {'display': 'Previous Surgery History: History of abdominal surgery', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'PreviousAbdominopelvicSurgery_3.0': {'display': 'Previous Surgery History: History of pelvic surgery', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'DietaryRestriction_1': {'display': 'Diet Restriction Type: Fasting', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'DietaryRestriction_2': {'display': 'Diet Restriction Type: Low-residue', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'DietaryRestriction_3': {'display': 'Diet Restriction Type: Clear liquid', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'DietaryRestriction_4': {'display': 'Diet Restriction Type: Regular', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'LaxativeRegimen_1': {'display': 'Laxative Regimen: PEG 2L', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'LaxativeRegimen_2': {'display': 'Laxative Regimen: PEG 3L', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'LaxativeRegimen_3': {'display': 'Laxative Regimen: PEG 4L', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'LaxativeRegimen_4': {'display': 'Laxative Regimen: Sodium phosphate', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'LaxativeRegimen_5': {'display': 'Laxative Regimen: Combination regimen', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
-    'LaxativeRegimen_6': {'display': 'Laxative Regimen: Magnesium salts', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}}
+    'PreviousAbdominopelvicSurgery_1.0': {'display': 'History of abdominal/pelvic surgery', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'},'default': 1},
+    'PreviousAbdominopelvicSurgery_2.0': {'display': 'History of abdominal surgery', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'PreviousAbdominopelvicSurgery_3.0': {'display': 'History of pelvic surgery', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'DietaryRestriction_1': {'display': 'Fasting', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'DietaryRestriction_2': {'display': 'Low-residue', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'DietaryRestriction_3': {'display': 'Clear liquid', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'DietaryRestriction_4': {'display': 'Regular', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'LaxativeRegimen_1': {'display': 'PEG 2L', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'LaxativeRegimen_2': {'display': 'PEG 3L', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'LaxativeRegimen_3': {'display': 'PEG 4L', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'LaxativeRegimen_4': {'display': 'Sodium phosphate', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'LaxativeRegimen_5': {'display': 'Combination regimen', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
+    'LaxativeRegimen_6': {'display': 'Magnesium salts', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}}
 }
 
 # Required feature order (match training data)
@@ -73,7 +73,8 @@ def create_input_form():
             input_data['HospitalGrade'] = st.selectbox(
                 FEATURE_DETAILS['HospitalGrade']['display'],
                 FEATURE_DETAILS['HospitalGrade']['options'],
-                format_func=lambda x: FEATURE_DETAILS['HospitalGrade']['labels'][x]
+                format_func=lambda x: FEATURE_DETAILS['HospitalGrade']['labels'][x],
+                index=FEATURE_DETAILS['HospitalGrade']['options'].index(FEATURE_DETAILS['HospitalGrade']['default'])
             )
             input_data['Age'] = st.slider(FEATURE_DETAILS['Age']['display'], FEATURE_DETAILS['Age']['min'], FEATURE_DETAILS['Age']['max'], FEATURE_DETAILS['Age']['default'])
             input_data['Sex'] = st.selectbox(FEATURE_DETAILS['Sex']['display'], FEATURE_DETAILS['Sex']['options'], format_func=lambda x: FEATURE_DETAILS['Sex']['labels'][x])
@@ -91,22 +92,23 @@ def create_input_form():
 
         # Column 2: Preparation & Surgery History
         with cols_main[1]:
-            st.markdown("**Bowel Preparation**")
+            st.markdown("**Patient Education**")
             # 修正BP Education Modality选择框，显示英文标签
             input_data['BPEducationModality'] = st.selectbox(
                 FEATURE_DETAILS['BPEducationModality']['display'],
                 FEATURE_DETAILS['BPEducationModality']['options'],
-                format_func=lambda x: FEATURE_DETAILS['BPEducationModality']['labels'][x]
+                format_func=lambda x: FEATURE_DETAILS['BPEducationModality']['labels'][x],
+                index=FEATURE_DETAILS['BPEducationModality']['options'].index(FEATURE_DETAILS['BPEducationModality']['default'])
             )
-            input_data['DietaryRestrictionDays'] = st.slider(FEATURE_DETAILS['DietaryRestrictionDays']['display'], FEATURE_DETAILS['DietaryRestrictionDays']['min'], FEATURE_DETAILS['DietaryRestrictionDays']['max'], FEATURE_DETAILS['DietaryRestrictionDays']['default'])
+
             input_data['PreColonoscopyPhysicalActivity'] = st.selectbox(FEATURE_DETAILS['PreColonoscopyPhysicalActivity']['display'], FEATURE_DETAILS['PreColonoscopyPhysicalActivity']['options'], format_func=lambda x: FEATURE_DETAILS['PreColonoscopyPhysicalActivity']['labels'][x])
             
             st.markdown("**Previous Surgery History**")
-            input_data['PreviousAbdominopelvicSurgery_1.0'] = st.selectbox(FEATURE_DETAILS['PreviousAbdominopelvicSurgery_1.0']['display'], FEATURE_DETAILS['PreviousAbdominopelvicSurgery_1.0']['options'], format_func=lambda x: FEATURE_DETAILS['PreviousAbdominopelvicSurgery_1.0']['labels'][x])
+            input_data['PreviousAbdominopelvicSurgery_1.0'] = st.selectbox(FEATURE_DETAILS['PreviousAbdominopelvicSurgery_1.0']['display'], FEATURE_DETAILS['PreviousAbdominopelvicSurgery_1.0']['options'], format_func=lambda x: FEATURE_DETAILS['PreviousAbdominopelvicSurgery_1.0']['labels'][x], index=FEATURE_DETAILS['PreviousAbdominopelvicSurgery_1.0']['options'].index(FEATURE_DETAILS['PreviousAbdominopelvicSurgery_1.0']['default']))
             input_data['PreviousAbdominopelvicSurgery_2.0'] = st.selectbox(FEATURE_DETAILS['PreviousAbdominopelvicSurgery_2.0']['display'], FEATURE_DETAILS['PreviousAbdominopelvicSurgery_2.0']['options'], format_func=lambda x: FEATURE_DETAILS['PreviousAbdominopelvicSurgery_2.0']['labels'][x])
             input_data['PreviousAbdominopelvicSurgery_3.0'] = st.selectbox(FEATURE_DETAILS['PreviousAbdominopelvicSurgery_3.0']['display'], FEATURE_DETAILS['PreviousAbdominopelvicSurgery_3.0']['options'], format_func=lambda x: FEATURE_DETAILS['PreviousAbdominopelvicSurgery_3.0']['labels'][x])
             
-            st.markdown("**Diet Restriction Type**")
+            st.markdown("**Diet Restriction**")
             cols_diet = st.columns(2)
             with cols_diet[0]:
                 input_data['DietaryRestriction_1'] = st.selectbox(FEATURE_DETAILS['DietaryRestriction_1']['display'], FEATURE_DETAILS['DietaryRestriction_1']['options'], format_func=lambda x: FEATURE_DETAILS['DietaryRestriction_1']['labels'][x])
@@ -114,7 +116,8 @@ def create_input_form():
             with cols_diet[1]:
                 input_data['DietaryRestriction_3'] = st.selectbox(FEATURE_DETAILS['DietaryRestriction_3']['display'], FEATURE_DETAILS['DietaryRestriction_3']['options'], format_func=lambda x: FEATURE_DETAILS['DietaryRestriction_3']['labels'][x])
                 input_data['DietaryRestriction_4'] = st.selectbox(FEATURE_DETAILS['DietaryRestriction_4']['display'], FEATURE_DETAILS['DietaryRestriction_4']['options'], format_func=lambda x: FEATURE_DETAILS['DietaryRestriction_4']['labels'][x])
-            
+               
+               input_data['DietaryRestrictionDays'] = st.slider(FEATURE_DETAILS['DietaryRestrictionDays']['display'], FEATURE_DETAILS['DietaryRestrictionDays']['min'], FEATURE_DETAILS['DietaryRestrictionDays']['max'], FEATURE_DETAILS['DietaryRestrictionDays']['default'])
             st.markdown("**Laxative Regimen**")
             cols_lax = st.columns(3)
             with cols_lax[0]:
@@ -300,10 +303,15 @@ def explain_prediction(model, patient_data):
 
 # ========== Main Function ==========
 def main():
-    st.title("Bowel Preparation Outcome Predictor")
+    st.title("Colonoscopy Bowel Preparation Quality Predictor")
     st.markdown("""
-This is a tool designed to predict the outcome of bowel preparation before a colonoscopy. It was developed using data from more than 12,000 colonoscopy patients across over 170 hospitals nationwide. Based on a random forest model, the tool predicts a patient’s risk level (high/low) of inadequate bowel preparation using 16 features: age, sex, BMI, chronic constipation, diabetes mellitus, previous surgery history, previous colonoscopy, inpatient status, bowel preparation education modality, diet restriction type, dietary restriction days, laxative regimen, bowel movements, stool form, pre-colonoscopy physical activity and hospital grade. Additionally, the tool incorporates a counterfactual module that provides targeted improvement suggestions for clinicians and patients to help reduce the risk of preparation failure.
-    """)
+This is a tool designed to predict the quality of bowel preparation before a colonoscopy. It was developed using data from more than 12,000 
+colonoscopy patients across over 170 hospitals nationwide. Based on a random forest model, the tool predicts a patient’s risk level (high/low) 
+of inadequate bowel preparation using 16 features: age, sex, BMI, chronic constipation, diabetes mellitus, previous surgery history, previous
+ colonoscopy, inpatient status, bowel preparation education modality, diet restriction type, dietary restriction days, laxative regimen, bowel 
+movements, stool form, pre-colonoscopy physical activity and hospital grade. Additionally, the tool incorporates a counterfactual module 
+that provides targeted improvement suggestions for clinicians and patients to help reduce the risk of preparation inadequate. 
+   """)
     
     # Load model
     model = load_model()
@@ -314,12 +322,7 @@ This is a tool designed to predict the outcome of bowel preparation before a col
     patient_data = create_input_form()
     
     if patient_data is not None:
-        # Display input data
-        st.subheader("Patient Input Summary")
-        display_df = patient_data.copy()
-        display_df.columns = [FEATURE_DETAILS[col]['display'] for col in display_df.columns]
-        st.dataframe(display_df.T, column_config={"0": "Value"}, use_container_width=True)
-        
+               
         # Predict
         wrapped_model = ModelWrapper(model)
         prob = wrapped_model.predict_proba(patient_data)[:, 1][0]
@@ -369,13 +372,14 @@ This is a tool designed to predict the outcome of bowel preparation before a col
                     for feature, change in explanations[i].items():
                         st.write(f"- {feature}: {change}")
                     # 定义cf_display并展示
-                    cf_display = cf[FEATURE_ORDER]  # 直接取反事实的所有特征列
-                    cf_display.index = [FEATURE_DETAILS[col]['display'] for col in cf_display.index]
-                    st.dataframe(cf_display.T, use_container_width=True)
+                    #cf_display = cf[FEATURE_ORDER]  # 直接取反事实的所有特征列
+                    #cf_display.index = [FEATURE_DETAILS[col]['display'] for col in cf_display.index]
+                    #st.dataframe(cf_display.T, use_container_width=True)
             else:
                 st.info("No valid counterfactual recommendations found.")
 
 if __name__ == "__main__":
     main()
+
 
 
