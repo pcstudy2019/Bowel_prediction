@@ -264,7 +264,19 @@ def generate_counterfactuals(model, patient_data):
                 changes = {}
                 for col in cf.index:
                     if col != 'outcome' and cf[col] != patient_data[col].values[0]:
-                        changes[col] = f"{patient_data[col].values[0]} → {cf[col]}"
+                        display_name = FEATURE_DETAILS.get(col, {}).get('display', col)
+                        label_map = FEATURE_DETAILS.get(col, {}).get('labels', {})
+
+              # 原始值和新值
+                        orig_val = patient_data[col].values[0]
+                        new_val = cf[col]
+                        # 映射为标签（如果有labels字典，否则保持原值）
+                        orig_label = label_map.get(orig_val, orig_val)
+                        new_label = label_map.get(new_val, new_val)
+
+                # 使用显示名称作为key，标签作为值
+                       changes[display_name] = f"{orig_label} → {new_label}"
+                    
                 explanations.append(changes)
         
         return filtered_cf_df, explanations
@@ -380,6 +392,7 @@ that provides targeted improvement suggestions for clinicians and patients to he
 
 if __name__ == "__main__":
     main()
+
 
 
 
