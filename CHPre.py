@@ -275,7 +275,7 @@ def generate_counterfactuals(model, patient_data):
                         new_label = label_map.get(new_val, new_val)
 
                 # 使用显示名称作为key，标签作为值
-                       changes[display_name] = f"{orig_label} → {new_label}"
+                        changes[display_name] = f"{orig_label} → {new_label}"
                     
                 explanations.append(changes)
         
@@ -392,6 +392,7 @@ that provides targeted improvement suggestions for clinicians and patients to he
 
 if __name__ == "__main__":
     main()
+
 
 
 
