@@ -30,7 +30,8 @@ FEATURE_DETAILS = {
     'HospitalGrade': {'display': 'Hospital Grade', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Non-Tertiary', 2: 'Tertiary'}, 'default': 2},
     'Age': {'display': 'Age (years)', 'type': 'slider', 'min': 18, 'max': 90, 'default': 55},
     'Sex': {'display': 'Sex', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Female', 2: 'Male'}},
-    'BMI': {'display': 'BMI', 'type': 'slider', 'min': 15, 'max': 40, 'default': 28},
+    'Height': {'display': 'Height (cm)', 'type': 'slider', 'min': 100, 'max': 250, 'default': 165},
+    'Weight': {'display': 'Weight (Kg)', 'type': 'slider', 'min': 30, 'max': 200, 'default': 65},
     'InpatientStatus': {'display': 'Inpatient Status', 'type': 'select', 'options': [1, 2], 'labels': {1: 'Outpatient', 2: 'Inpatient'}},
     'PreviousColonoscopy': {'display': 'Previous Colonoscopy', 'type': 'select', 'options': [1, 2], 'labels': {2: 'No', 1: 'Yes'}},
     'ChronicConstipation': {'display': 'Chronic Constipation', 'type': 'select', 'options': [0, 1], 'labels': {0: 'No', 1: 'Yes'}},
@@ -57,7 +58,16 @@ FEATURE_DETAILS = {
 
 # Required feature order (match training data)
 FEATURE_ORDER = list(FEATURE_DETAILS.keys())
-
+# 模型训练数据的特征顺序（含BMI，去掉Height/Weight，与train_data.csv列顺序对齐）
+MODEL_FEATURE_ORDER = [
+    'HospitalGrade', 'Age', 'Sex', 'BMI', 'InpatientStatus', 'PreviousColonoscopy',
+    'ChronicConstipation', 'DiabetesMellitus', 'StoolForm', 'BowelMovements',
+    'BPEducationModality', 'DietaryRestrictionDays', 'PreColonoscopyPhysicalActivity',
+    'PreviousAbdominopelvicSurgery_1.0', 'PreviousAbdominopelvicSurgery_2.0',
+    'PreviousAbdominopelvicSurgery_3.0', 'DietaryRestriction_1', 'DietaryRestriction_2',
+    'DietaryRestriction_3', 'DietaryRestriction_4', 'LaxativeRegimen_1', 'LaxativeRegimen_2',
+    'LaxativeRegimen_3', 'LaxativeRegimen_4', 'LaxativeRegimen_5', 'LaxativeRegimen_6'
+]
 def create_input_form():
     with st.form("patient_input_form"):
         st.subheader("Patient Feature Input")
@@ -78,7 +88,9 @@ def create_input_form():
             )
             input_data['Age'] = st.slider(FEATURE_DETAILS['Age']['display'], FEATURE_DETAILS['Age']['min'], FEATURE_DETAILS['Age']['max'], FEATURE_DETAILS['Age']['default'])
             input_data['Sex'] = st.selectbox(FEATURE_DETAILS['Sex']['display'], FEATURE_DETAILS['Sex']['options'], format_func=lambda x: FEATURE_DETAILS['Sex']['labels'][x])
-            input_data['BMI'] = st.slider(FEATURE_DETAILS['BMI']['display'], FEATURE_DETAILS['BMI']['min'], FEATURE_DETAILS['BMI']['max'], FEATURE_DETAILS['BMI']['default'])
+            input_data['Height'] = st.slider(FEATURE_DETAILS['Height']['display'], FEATURE_DETAILS['Height']['min'], FEATURE_DETAILS['Height']['max'], FEATURE_DETAILS['Height']['default'])
+            input_data['Weight'] = st.slider(FEATURE_DETAILS['Weight']['display'], FEATURE_DETAILS['Weight']['min'], FEATURE_DETAILS['Weight']['max'], FEATURE_DETAILS['Weight']['default'])
+
             
             st.markdown("**Clinical History**")
             input_data['InpatientStatus'] = st.selectbox(FEATURE_DETAILS['InpatientStatus']['display'], FEATURE_DETAILS['InpatientStatus']['options'], format_func=lambda x: FEATURE_DETAILS['InpatientStatus']['labels'][x])
@@ -133,10 +145,27 @@ def create_input_form():
         # Submit button
         submitted = st.form_submit_button("Predict")
         if submitted:
-            # Reorder input data to match training order
-            patient_df = pd.DataFrame([input_data], columns=FEATURE_ORDER)
+            # 关键步骤：计算BMI（单位转换+公式计算）
+            height_cm = input_data.pop('Height')  # 移除身高输入，提取值
+            weight_kg = input_data.pop('Weight')  # 移除体重输入，提取值
+            height_m = height_cm / 100  # CM→M转换
+            bmi = round(weight_kg / (height_m ** 2), 1)  # 计算BMI，保留1位小数（临床常规）
+            
+            # 构建模型输入数据（补充计算出的BMI）
+            model_input_data = input_data.copy()
+            model_input_data['BMI'] = bmi  # 新增BMI特征值
+            
+            # 按模型要求的特征顺序整理数据
+            patient_df = pd.DataFrame([model_input_data], columns=MODEL_FEATURE_ORDER)
+            
+            # 暂存身高/体重用于后续显示（可选，提升用户体验）
+            st.session_state['height_cm'] = height_cm
+            st.session_state['weight_kg'] = weight_kg
+            st.session_state['calculated_bmi'] = bmi
+            
             return patient_df
     return None
+
 
 # ========== Model Wrapper for Threshold ==========
 class ModelWrapper:
@@ -297,7 +326,7 @@ def explain_prediction(model, patient_data):
     base_value = explainer.expected_value[1]
     sample_shap = shap_values[1][0]  # 当前样本的SHAP值
     sample_features = patient_data.iloc[0]  # 当前样本的特征值
-    feature_names = [FEATURE_DETAILS[col]['display'] for col in FEATURE_ORDER]
+    feature_names = [FEATURE_DETAILS.get(col, {'display': col})['display'] for col in MODEL_FEATURE_ORDER]
     
     # 创建Waterfall图（你想要的第二张图类型）
     fig = plt.figure(figsize=(10, 6))
@@ -334,6 +363,17 @@ that provides targeted improvement suggestions for clinicians and patients to he
     patient_data = create_input_form()
     
     if patient_data is not None:
+        # Display input data
+        st.subheader("Patient Input Summary")
+        display_df = patient_data.copy()
+        # 修复后代码：对BMI特殊处理，其他列正常读取
+        display_df.columns = [
+            'BMI (Calculated)' if col == 'BMI'  # 手动指定BMI的显示名
+            else FEATURE_DETAILS[col]['display']  # 其他列从FEATURE_DETAILS获取
+            for col in display_df.columns
+        ]
+        st.dataframe(display_df.T, column_config={"0": "Value"}, use_container_width=True)
+
                
         # Predict
         wrapped_model = ModelWrapper(model)
@@ -379,19 +419,25 @@ that provides targeted improvement suggestions for clinicians and patients to he
             if not cf_df.empty:
                 st.write("Valid Counterfactual Recommendations:")
                 for i, (_, cf) in enumerate(cf_df.iterrows()):
-                    st.markdown(f"**Counterfactual {i+1}**")  # 反事实改为英文
+                    st.markdown(f"**反事实 {i+1}**")
                     # 遍历当前反事实的特征变化
                     for feature, change in explanations[i].items():
                         st.write(f"- {feature}: {change}")
                     # 定义cf_display并展示
-                    #cf_display = cf[FEATURE_ORDER]  # 直接取反事实的所有特征列
-                    #cf_display.index = [FEATURE_DETAILS[col]['display'] for col in cf_display.index]
-                    #st.dataframe(cf_display.T, use_container_width=True)
+                    cf_display = cf[MODEL_FEATURE_ORDER]  # 直接取反事实的所有特征列
+                    cf_display.index = [
+                        'BMI (Calculated)' if col == 'BMI'  # 手动指定BMI的显示名
+                        else FEATURE_DETAILS[col]['display']  # 其他列正常读取
+                        for col in cf_display.index
+                    ]
+                    st.dataframe(cf_display.T, use_container_width=True)
             else:
                 st.info("No valid counterfactual recommendations found.")
 
+
 if __name__ == "__main__":
     main()
+
 
 
 
